@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.3.72"
     id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
+    id("org.sonarqube") version "3.0"
     jacoco
 }
 
@@ -31,5 +32,12 @@ tasks {
         reports {
             xml.isEnabled = true
         }
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.junit.reportPaths", "build/test-results/test")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
