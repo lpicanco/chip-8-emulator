@@ -1,4 +1,4 @@
-name: Java8
+name: JVM
 
 on:
   push:
