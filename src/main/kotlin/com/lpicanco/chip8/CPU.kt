@@ -44,7 +44,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
 
     private fun clearScreenOrReturn(opcode: Opcode) = when (opcode.value) {
         OPCODE_CLEAR_SCREEN -> clearScreen()
-        OPCODE_RETURN_FROM_SUBROUTINE -> returnFromSubRoutine(opcode)
+        OPCODE_RETURN_FROM_SUBROUTINE -> returnFromSubRoutine()
         else -> TODO("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
@@ -53,7 +53,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         incPC()
     }
 
-    private fun returnFromSubRoutine(opcode: Opcode) {
+    private fun returnFromSubRoutine() {
         pc = stack[--sp]
         incPC()
     }
