@@ -1,5 +1,6 @@
 package com.lpicanco.chip8
 
+@ExperimentalUnsignedTypes
 class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     val screen: Screen = Screen(SCREEN_PIXELS)
     val registers: Registers = Registers(REGISTER_COUNT)
@@ -32,21 +33,56 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     private fun executeOpCode(opcode: Opcode) {
         // Instruction is in the first 4 bits.
         when (opcode.instruction) {
-            OPCODE_CLEAR_SCREEN -> clearScreen()
+            OPCODE_CLEAR_SCREEN_OR_RETURN -> clearScreenOrReturn(opcode)
+            OPCODE_JUMP_TO_ADDRESS_NNN -> jumpToAddressNnn(opcode)
+            OPCODE_CALL_SUBROUTINE_AT_NNN -> callSubroutineAtNnn(opcode)
+            OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
             OPCODE_SET_VX_TO_NN -> setVxToNn(opcode)
             else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
         }
-
-        // The PC should be incremented by 2.
-        pc += 2
     }
 
-    private fun setVxToNn(opcode: Opcode) {
-        registers[opcode.vx] = opcode.nnData
+    private fun clearScreenOrReturn(opcode: Opcode) = when (opcode.value) {
+        OPCODE_CLEAR_SCREEN -> clearScreen()
+        OPCODE_RETURN_FROM_SUBROUTINE -> returnFromSubRoutine(opcode)
+        else -> TODO("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
     private fun clearScreen() {
         screen.fill(false)
+        incPC()
+    }
+
+    private fun returnFromSubRoutine(opcode: Opcode) {
+        pc = stack[--sp]
+        incPC()
+    }
+
+    // Jumps to address NNN.
+    private fun jumpToAddressNnn(opcode: Opcode) {
+        pc = opcode.nnnData
+    }
+
+    // Calls subroutine at NNN.
+    private fun callSubroutineAtNnn(opcode: Opcode) {
+        stack[sp++] = pc
+        pc = opcode.nnnData
+    }
+
+    // Sets VX to NN.
+    private fun setVxToNn(opcode: Opcode) {
+        registers[opcode.vx] = opcode.nnData
+        incPC()
+    }
+
+    // Adds NN to VX. (Carry flag is not changed)
+    private fun addNnToVx(opcode: Opcode) {
+        registers[opcode.vx] = (registers[opcode.vx] + opcode.nnData).toUByte().toInt()
+        incPC()
+    }
+
+    private fun incPC() {
+        pc += 2
     }
 
     override fun equals(other: Any?): Boolean {
@@ -85,7 +121,13 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         const val PROGRAM_ROM_START: Register = 0x200
         const val STACK_POINTER_START: Register = 0x0
         const val I_REGISTER_START: Register = 0x0
-        private const val OPCODE_CLEAR_SCREEN: Instruction = 0xA000
+
+        private const val OPCODE_CLEAR_SCREEN_OR_RETURN: Instruction = 0x0000
+        private const val OPCODE_CLEAR_SCREEN: Instruction = 0x00E0
+        private const val OPCODE_RETURN_FROM_SUBROUTINE: Instruction = 0x00EE
+        private const val OPCODE_JUMP_TO_ADDRESS_NNN: Instruction = 0x1000
+        private const val OPCODE_CALL_SUBROUTINE_AT_NNN: Instruction = 0x2000
         private const val OPCODE_SET_VX_TO_NN: Instruction = 0x6000
+        private const val OPCODE_ADD_NN_TO_VX: Instruction = 0x7000
     }
 }

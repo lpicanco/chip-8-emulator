@@ -22,4 +22,10 @@ internal class OpcodeTest {
         val opcode = Opcode(0x6A42)
         assertEquals(0x42, opcode.nnData)
     }
+
+    @Test
+    fun `should return the opcode nnnData`() {
+        val opcode = Opcode(0x1A42)
+        assertEquals(0xA42, opcode.nnnData)
+    }
 }
