@@ -20,6 +20,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
 
     fun tick() {
         val opCode = fetchOpcode()
+        incPC()
         executeOpCode(opCode)
     }
 
@@ -42,6 +43,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_SET_VX_TO_NN -> setVxToNn(opcode)
             OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
             OPCODE_SET_VX_TO_VY -> setVxToVy(opcode)
+            OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY -> skipNextIfVxNotEqualsVy(opcode)
             else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
         }
     }
@@ -54,12 +56,10 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
 
     private fun clearScreen() {
         screen.fill(false)
-        incPC()
     }
 
     private fun returnFromSubRoutine() {
         pc = stack[--sp]
-        incPC()
     }
 
     // Jumps to address NNN.
@@ -78,8 +78,6 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         if (registers[opcode.vx] == opcode.nnData) {
             incPC()
         }
-
-        incPC()
     }
 
     // Skips the next instruction if VX doesn't equal NN.
@@ -87,8 +85,6 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         if (registers[opcode.vx] != opcode.nnData) {
             incPC()
         }
-
-        incPC()
     }
 
     // Skips the next instruction if VX equals VY.
@@ -96,26 +92,28 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         if (registers[opcode.vx] == registers[opcode.vy]) {
             incPC()
         }
+    }
 
-        incPC()
+    // Skips the next instruction if VX not equals VY.
+    private fun skipNextIfVxNotEqualsVy(opcode: Opcode) {
+        if (registers[opcode.vx] != registers[opcode.vy]) {
+            incPC()
+        }
     }
 
     // Sets VX to NN.
     private fun setVxToNn(opcode: Opcode) {
         registers[opcode.vx] = opcode.nnData
-        incPC()
     }
 
     // Adds NN to VX. (Carry flag is not changed)
     private fun addNnToVx(opcode: Opcode) {
         registers[opcode.vx] = (registers[opcode.vx] + opcode.nnData).toUByte().toInt()
-        incPC()
     }
 
     // Sets VX to the value of VY.
     private fun setVxToVy(opcode: Opcode) {
         registers[opcode.vx] = registers[opcode.vy]
-        incPC()
     }
 
     private fun incPC() {
@@ -170,5 +168,6 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_SET_VX_TO_NN: Instruction = 0x6000
         private const val OPCODE_ADD_NN_TO_VX: Instruction = 0x7000
         private const val OPCODE_SET_VX_TO_VY: Instruction = 0x8000
+        private const val OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY: Instruction = 0x9000
     }
 }
