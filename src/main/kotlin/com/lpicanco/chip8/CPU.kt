@@ -36,6 +36,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_CLEAR_SCREEN_OR_RETURN -> clearScreenOrReturn(opcode)
             OPCODE_JUMP_TO_ADDRESS_NNN -> jumpToAddressNnn(opcode)
             OPCODE_CALL_SUBROUTINE_AT_NNN -> callSubroutineAtNnn(opcode)
+            OPCODE_SKIP_NEXT_IF_VX_EQUALS_NN -> skipNextIfVxEqualsNn(opcode)
+            OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_NN -> skipNextIfVxNotEqualsNn(opcode)
+            OPCODE_SKIP_NEXT_IF_VX_EQUALS_VY -> skipNextIfVxEqualsVy(opcode)
             OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
             OPCODE_SET_VX_TO_NN -> setVxToNn(opcode)
             else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
@@ -67,6 +70,33 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     private fun callSubroutineAtNnn(opcode: Opcode) {
         stack[sp++] = pc
         pc = opcode.nnnData
+    }
+
+    // Skips the next instruction if VX equals NN.
+    private fun skipNextIfVxEqualsNn(opcode: Opcode) {
+        if (registers[opcode.vx] == opcode.nnData) {
+            incPC()
+        }
+
+        incPC()
+    }
+
+    // Skips the next instruction if VX doesn't equal NN.
+    private fun skipNextIfVxNotEqualsNn(opcode: Opcode) {
+        if (registers[opcode.vx] != opcode.nnData) {
+            incPC()
+        }
+
+        incPC()
+    }
+
+    // Skips the next instruction if VX equals VY.
+    private fun skipNextIfVxEqualsVy(opcode: Opcode) {
+        if (registers[opcode.vx] == registers[opcode.vy]) {
+            incPC()
+        }
+
+        incPC()
     }
 
     // Sets VX to NN.
@@ -127,6 +157,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_RETURN_FROM_SUBROUTINE: Instruction = 0x00EE
         private const val OPCODE_JUMP_TO_ADDRESS_NNN: Instruction = 0x1000
         private const val OPCODE_CALL_SUBROUTINE_AT_NNN: Instruction = 0x2000
+        private const val OPCODE_SKIP_NEXT_IF_VX_EQUALS_NN: Instruction = 0x3000
+        private const val OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_NN: Instruction = 0x4000
+        private const val OPCODE_SKIP_NEXT_IF_VX_EQUALS_VY: Instruction = 0x5000
         private const val OPCODE_SET_VX_TO_NN: Instruction = 0x6000
         private const val OPCODE_ADD_NN_TO_VX: Instruction = 0x7000
     }

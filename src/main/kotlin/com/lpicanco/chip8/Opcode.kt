@@ -10,6 +10,10 @@ inline class Opcode(val value: Int) {
     val vx: Register
         get() = (value and 0x0F00).shr(8)
 
+    // 0x5AB0 -> 0xB
+    val vy: Register
+        get() = (value and 0x00F0).shr(4)
+
     // 0x6B42 -> 0x42
     val nnData: Int
         get() = value and 0x00FF

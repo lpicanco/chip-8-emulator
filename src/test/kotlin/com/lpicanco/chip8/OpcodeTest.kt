@@ -18,6 +18,12 @@ internal class OpcodeTest {
     }
 
     @Test
+    fun `should return the opcode vy`() {
+        val opcode = Opcode(0x6A42)
+        assertEquals(0x4, opcode.vy)
+    }
+
+    @Test
     fun `should return the opcode nnData`() {
         val opcode = Opcode(0x6A42)
         assertEquals(0x42, opcode.nnData)

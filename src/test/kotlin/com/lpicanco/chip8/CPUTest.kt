@@ -50,6 +50,95 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should skip next instruction if VX equals NN`() {
+        cpu.registers[0xA] = 0x55
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x3A // Skip if VA
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x55 // == 0x55
+
+        cpu.memory[CPU.PROGRAM_ROM_START + 4] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 5] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should not skip next instruction if VX not equals NN`() {
+        cpu.registers[0xA] = 0x99
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x3A // Skip if VA
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x55 // == 0x55
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should skip next instruction if VX not equals NN`() {
+        cpu.registers[0xA] = 0x99
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x4A // Skip if VA
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x56 // != 0x55
+
+        cpu.memory[CPU.PROGRAM_ROM_START + 4] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 5] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should not skip next instruction if VX equals NN`() {
+        cpu.registers[0xA] = 0x56
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x4A // Skip if VA
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x56 // != 0x55
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should skip next instruction if VX equals VY`() {
+        cpu.registers[0xA] = 0x55
+        cpu.registers[0xB] = 0x55
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x5A // Skip if VA
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xB0 // == VB
+
+        cpu.memory[CPU.PROGRAM_ROM_START + 4] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 5] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should not skip next instruction if VX not equals VY`() {
+        cpu.registers[0xA] = 0x55
+        cpu.registers[0xB] = 0x66
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x5A // Skip if VA
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xB0 // == VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
     fun `should return from a subroutine`() {
         val subRoutineAddress = 0xF15
         // Return from the subroutine.
