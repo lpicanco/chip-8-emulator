@@ -39,8 +39,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_SKIP_NEXT_IF_VX_EQUALS_NN -> skipNextIfVxEqualsNn(opcode)
             OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_NN -> skipNextIfVxNotEqualsNn(opcode)
             OPCODE_SKIP_NEXT_IF_VX_EQUALS_VY -> skipNextIfVxEqualsVy(opcode)
-            OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
             OPCODE_SET_VX_TO_NN -> setVxToNn(opcode)
+            OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
+            OPCODE_SET_VX_TO_VY -> setVxToVy(opcode)
             else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
         }
     }
@@ -111,6 +112,12 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         incPC()
     }
 
+    // Sets VX to the value of VY.
+    private fun setVxToVy(opcode: Opcode) {
+        registers[opcode.vx] = registers[opcode.vy]
+        incPC()
+    }
+
     private fun incPC() {
         pc += 2
     }
@@ -162,5 +169,6 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_SKIP_NEXT_IF_VX_EQUALS_VY: Instruction = 0x5000
         private const val OPCODE_SET_VX_TO_NN: Instruction = 0x6000
         private const val OPCODE_ADD_NN_TO_VX: Instruction = 0x7000
+        private const val OPCODE_SET_VX_TO_VY: Instruction = 0x8000
     }
 }

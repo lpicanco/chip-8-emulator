@@ -198,6 +198,17 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should set VX to VY`() {
+        cpu.registers[0xC] = 0x42
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC0 // with VC
+
+        cpu.tick()
+
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
     fun `should reset the CPU`() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x6B // Sets VB
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x42 // with 0x42
