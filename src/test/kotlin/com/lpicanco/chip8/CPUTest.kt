@@ -4,7 +4,6 @@ import org.junit.Test
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
-@ExperimentalUnsignedTypes
 internal class CPUTest {
     private lateinit var cpu: CPU
 
@@ -237,6 +236,16 @@ internal class CPUTest {
         cpu.tick()
 
         assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should set I to NNN`() {
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xA7 // Sets I
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x65 // with 0x765
+
+        cpu.tick()
+
+        assertEquals(0x765, cpu.i)
     }
 
     @Test

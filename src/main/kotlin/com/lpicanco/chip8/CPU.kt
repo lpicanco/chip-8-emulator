@@ -1,11 +1,11 @@
 package com.lpicanco.chip8
 
-@ExperimentalUnsignedTypes
 class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     val screen: Screen = Screen(SCREEN_PIXELS)
     val registers: Registers = Registers(REGISTER_COUNT)
     val stack: Stack = Stack(STACK_SIZE)
-    private var i: Register = I_REGISTER_START
+    var i: Register = I_REGISTER_START
+        private set
     private var pc: Register = PROGRAM_ROM_START
     private var sp: Pointer = STACK_POINTER_START
 
@@ -44,6 +44,8 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
             OPCODE_SET_VX_TO_VY -> setVxToVy(opcode)
             OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY -> skipNextIfVxNotEqualsVy(opcode)
+            OPCODE_SET_I_TO_NNN -> setIToNnn(opcode)
+            OPCODE_DRAW_N_AT_VX_VY -> drawNAtVxVy(opcode)
             else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
         }
     }
@@ -116,6 +118,45 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         registers[opcode.vx] = registers[opcode.vy]
     }
 
+    // Sets I to the address NNN.
+    private fun setIToNnn(opcode: Opcode) {
+        println("Setting I to [${opcode.nnnData.toString(16)}]($opcode)")
+        i = opcode.nnnData
+    }
+
+    // Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
+    // Each row of 8 pixels is read as bit-coded starting from memory location I;
+    // I value doesn't change after the execution of this instruction.
+    // VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn't happen
+    private fun drawNAtVxVy(opcode: Opcode) {
+        // X = VX % SCREEN_WIDTH and Y = VY % SCREEN_HEIGHT
+        val x = registers[opcode.vx] % SCREEN_WIDTH
+        val y = registers[opcode.vy] % SCREEN_HEIGHT
+
+        // Sets VF to 0
+        registers[VF_INDEX] = 0
+
+        (0 until opcode.nData).forEach { row ->
+            val currentSpriteByte = memory[i + row]
+
+            (0 until 8).forEach { col ->
+                val screenCoordinates = ((y + row) * SCREEN_WIDTH) + x + col
+                if (screenCoordinates >= SCREEN_PIXELS) {
+                    return
+                }
+
+                val currentPixel = screen[screenCoordinates]
+
+                if (currentSpriteByte and (0x80 shr col) > 0) {
+                    if (currentPixel) {
+                        registers[VF_INDEX] = 1
+                    }
+                    screen[screenCoordinates] = !screen[screenCoordinates]
+                }
+            }
+        }
+    }
+
     private fun incPC() {
         pc += 2
     }
@@ -150,9 +191,12 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
 
     companion object {
         const val MEMORY_SIZE = 4096
-        const val SCREEN_PIXELS = 2048
+        const val SCREEN_HEIGHT = 32
+        const val SCREEN_WIDTH = 64
+        const val SCREEN_PIXELS = SCREEN_HEIGHT * SCREEN_WIDTH
         const val STACK_SIZE = 16
         const val REGISTER_COUNT = 16
+        const val VF_INDEX = 0xF
         const val PROGRAM_ROM_START: Register = 0x200
         const val STACK_POINTER_START: Register = 0x0
         const val I_REGISTER_START: Register = 0x0
@@ -169,5 +213,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_ADD_NN_TO_VX: Instruction = 0x7000
         private const val OPCODE_SET_VX_TO_VY: Instruction = 0x8000
         private const val OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY: Instruction = 0x9000
+        private const val OPCODE_SET_I_TO_NNN: Instruction = 0xA000
+        private const val OPCODE_DRAW_N_AT_VX_VY: Instruction = 0xD000
     }
 }
