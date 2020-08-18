@@ -239,6 +239,42 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should set VX to VX OR VY`() {
+        cpu.registers[0xB] = 0b01000010
+        cpu.registers[0xC] = 0b10011000
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB with VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC1 // OR VC
+
+        cpu.tick()
+
+        assertEquals(0b11011010, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should set VX to VX AND VY`() {
+        cpu.registers[0xB] = 0b01010010
+        cpu.registers[0xC] = 0b10011010
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB with VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC2 // AND VC
+
+        cpu.tick()
+
+        assertEquals(0b00010010, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should set VX to VX XOR VY`() {
+        cpu.registers[0xB] = 0b01010010
+        cpu.registers[0xC] = 0b10011010
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB with VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC3 // XOR VC
+
+        cpu.tick()
+
+        assertEquals(0b11001000, cpu.registers[0xB])
+    }
+
+    @Test
     fun `should set I to NNN`() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xA7 // Sets I
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x65 // with 0x765

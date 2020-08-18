@@ -42,7 +42,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_SKIP_NEXT_IF_VX_EQUALS_VY -> skipNextIfVxEqualsVy(opcode)
             OPCODE_SET_VX_TO_NN -> setVxToNn(opcode)
             OPCODE_ADD_NN_TO_VX -> addNnToVx(opcode)
-            OPCODE_SET_VX_TO_VY -> setVxToVy(opcode)
+            OPCODE_VX_VY_OPERATION -> vxVyOperation(opcode)
             OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY -> skipNextIfVxNotEqualsVy(opcode)
             OPCODE_SET_I_TO_NNN -> setIToNnn(opcode)
             OPCODE_DRAW_N_AT_VX_VY -> drawNAtVxVy(opcode)
@@ -113,14 +113,36 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         registers[opcode.vx] = (registers[opcode.vx] + opcode.nnData).toUByte().toInt()
     }
 
+    private fun vxVyOperation(opcode: Opcode) = when (opcode.nData) {
+        OPCODE_N_SET_VX_TO_VY -> setVxToVy(opcode)
+        OPCODE_N_SET_VX_TO_VX_OR_VY -> setVxToVxOrVy(opcode)
+        OPCODE_N_SET_VX_TO_VX_AND_VY -> setVxToVxAndVy(opcode)
+        OPCODE_N_SET_VX_TO_VX_XOR_VY -> setVxToVxXorVy(opcode)
+        else -> TODO("Opcode ${opcode.value.toString(16)} not implemented.")
+    }
+
     // Sets VX to the value of VY.
     private fun setVxToVy(opcode: Opcode) {
         registers[opcode.vx] = registers[opcode.vy]
     }
 
+    // Sets VX to VX OR VY. (Bitwise OR operation)
+    private fun setVxToVxOrVy(opcode: Opcode) {
+        registers[opcode.vx] = registers[opcode.vx] or registers[opcode.vy]
+    }
+
+    // Sets VX to VX AND VY. (Bitwise OR operation)
+    private fun setVxToVxAndVy(opcode: Opcode) {
+        registers[opcode.vx] = registers[opcode.vx] and registers[opcode.vy]
+    }
+
+    // Sets VX to VX XOR VY. (Bitwise OR operation)
+    private fun setVxToVxXorVy(opcode: Opcode) {
+        registers[opcode.vx] = registers[opcode.vx] xor registers[opcode.vy]
+    }
+
     // Sets I to the address NNN.
     private fun setIToNnn(opcode: Opcode) {
-        println("Setting I to [${opcode.nnnData.toString(16)}]($opcode)")
         i = opcode.nnnData
     }
 
@@ -211,7 +233,16 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_SKIP_NEXT_IF_VX_EQUALS_VY: Instruction = 0x5000
         private const val OPCODE_SET_VX_TO_NN: Instruction = 0x6000
         private const val OPCODE_ADD_NN_TO_VX: Instruction = 0x7000
-        private const val OPCODE_SET_VX_TO_VY: Instruction = 0x8000
+        private const val OPCODE_VX_VY_OPERATION: Instruction = 0x8000
+        private const val OPCODE_N_SET_VX_TO_VY: Instruction = 0x0
+        private const val OPCODE_N_SET_VX_TO_VX_OR_VY: Instruction = 0x1
+        private const val OPCODE_N_SET_VX_TO_VX_AND_VY: Instruction = 0x2
+        private const val OPCODE_N_SET_VX_TO_VX_XOR_VY: Instruction = 0x3
+        private const val OPCODE_N_ADD_VY_TO_VX: Instruction = 0x4
+        private const val OPCODE_N_SUBTRACT_VY_FROM_VX: Instruction = 0x5
+        private const val OPCODE_N_SHIFT_RIGHT_VX_FROM_VY: Instruction = 0x6
+        private const val OPCODE_N_SUBTRACT_VX_FROM_VY: Instruction = 0x7
+        private const val OPCODE_N_SHIFT_LEFT_VX_FROM_VY: Instruction = 0xE
         private const val OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY: Instruction = 0x9000
         private const val OPCODE_SET_I_TO_NNN: Instruction = 0xA000
         private const val OPCODE_DRAW_N_AT_VX_VY: Instruction = 0xD000
