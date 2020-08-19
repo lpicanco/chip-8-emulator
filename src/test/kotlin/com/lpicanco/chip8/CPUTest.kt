@@ -275,6 +275,108 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should add VY to VX`() {
+        cpu.registers[0xB] = 0xA3
+        cpu.registers[0xC] = 0x3D
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Adds VC to VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC4
+
+        cpu.tick()
+
+        assertEquals(0xE0, cpu.registers[0xB])
+        assertEquals(0x0, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should add VY to VX and update VF with carry bit`() {
+        cpu.registers[0xB] = 0xA3
+        cpu.registers[0xC] = 0xFD
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Adds VC to VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC4
+
+        cpu.tick()
+
+        assertEquals(0xA0, cpu.registers[0xB])
+        assertEquals(0x1, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should subtract VY from VX and update VF with carry bit`() {
+        cpu.registers[0xB] = 0xF3
+        cpu.registers[0xC] = 0xAD
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB - VC
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC5
+
+        cpu.tick()
+
+        assertEquals(0x46, cpu.registers[0xB])
+        assertEquals(0x1, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should subtract VY from VX`() {
+        cpu.registers[0xB] = 0xAD
+        cpu.registers[0xC] = 0xF3
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB - VC
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC5
+
+        cpu.tick()
+
+        assertEquals(0xBA, cpu.registers[0xB])
+        assertEquals(0x0, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should shift right VX`() {
+        cpu.registers[0xB] = 0x77
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB >> 1
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC6
+
+        cpu.tick()
+
+        assertEquals(0x3B, cpu.registers[0xB])
+        assertEquals(0x1, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should shift left VX`() {
+        cpu.registers[0xB] = 0xFF
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB << 1
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xCE
+
+        cpu.tick()
+
+        assertEquals(0xFE, cpu.registers[0xB])
+        assertEquals(0x1, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should subtract VX from VY and update VF with carry bit`() {
+        cpu.registers[0xB] = 0xAD
+        cpu.registers[0xC] = 0xF3
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VC - VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC7
+
+        cpu.tick()
+
+        assertEquals(0x46, cpu.registers[0xB])
+        assertEquals(0x1, cpu.registers[0xF])
+    }
+
+    @Test
+    fun `should subtract VX from VY`() {
+        cpu.registers[0xB] = 0xF3
+        cpu.registers[0xC] = 0xAD
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VC - VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC7
+
+        cpu.tick()
+
+        assertEquals(0xBA, cpu.registers[0xB])
+        assertEquals(0x0, cpu.registers[0xF])
+    }
+
+    @Test
     fun `should set I to NNN`() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xA7 // Sets I
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x65 // with 0x765

@@ -118,6 +118,11 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         OPCODE_N_SET_VX_TO_VX_OR_VY -> setVxToVxOrVy(opcode)
         OPCODE_N_SET_VX_TO_VX_AND_VY -> setVxToVxAndVy(opcode)
         OPCODE_N_SET_VX_TO_VX_XOR_VY -> setVxToVxXorVy(opcode)
+        OPCODE_N_ADD_VY_TO_VX -> addVyToVx(opcode)
+        OPCODE_N_SUBTRACT_VY_FROM_VX -> subtractVyFromVx(opcode)
+        OPCODE_N_SHIFT_RIGHT_VX_FROM_VY -> shiftRightVx(opcode)
+        OPCODE_N_SUBTRACT_VX_FROM_VY -> subtractVxFromVy(opcode)
+        OPCODE_N_SHIFT_LEFT_VX_FROM_VY -> shiftLeftVx(opcode)
         else -> TODO("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
@@ -139,6 +144,45 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // Sets VX to VX XOR VY. (Bitwise OR operation)
     private fun setVxToVxXorVy(opcode: Opcode) {
         registers[opcode.vx] = registers[opcode.vx] xor registers[opcode.vy]
+    }
+
+    // Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
+    private fun addVyToVx(opcode: Opcode) {
+        val sum = registers[opcode.vx] + registers[opcode.vy]
+
+        if (sum > 0xFF) {
+            registers[VF_INDEX] = 1
+        }
+
+        registers[opcode.vx] = sum.toUByte().toInt()
+    }
+
+    // VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+    private fun subtractVyFromVx(opcode: Opcode) {
+        val x = registers[opcode.vx]
+        val y = registers[opcode.vy]
+        registers[VF_INDEX] = if (x > y) 1 else 0
+        registers[opcode.vx] = (x - y).toUByte().toInt()
+    }
+
+    // Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
+    private fun shiftRightVx(opcode: Opcode) {
+        registers[VF_INDEX] = registers[opcode.vx] and 0x1
+        registers[opcode.vx] = registers[opcode.vx] shr 1
+    }
+
+    // Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+    private fun subtractVxFromVy(opcode: Opcode) {
+        val x = registers[opcode.vx]
+        val y = registers[opcode.vy]
+        registers[VF_INDEX] = if (y > x) 1 else 0
+        registers[opcode.vx] = (y - x).toUByte().toInt()
+    }
+
+    // Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
+    private fun shiftLeftVx(opcode: Opcode) {
+        registers[VF_INDEX] = registers[opcode.vx] shr 7
+        registers[opcode.vx] = (registers[opcode.vx] shl 1).toUByte().toInt()
     }
 
     // Sets I to the address NNN.
