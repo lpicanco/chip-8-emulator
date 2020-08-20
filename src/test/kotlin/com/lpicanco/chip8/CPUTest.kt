@@ -31,6 +31,25 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should jump to address NNN+V0`() {
+        val jumpAddress = 0xF15
+        cpu.registers[0x0] = 2
+        cpu.memory[jumpAddress] = 0x6B // Sets VB
+        cpu.memory[jumpAddress + 1] = 0x42 // with 0x42
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xBF // Jump to F12 + 2(V0)
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x13
+
+        // Jump to jumpAddress
+        cpu.tick()
+
+        // Execute the code at the jumpAddress
+        cpu.tick()
+
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
     fun `should call subroutine at address NNN`() {
         val subRoutineAddress = 0xF15
         cpu.memory[subRoutineAddress] = 0x6B // Sets VB
@@ -387,15 +406,20 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should reset the CPU`() {
-        cpu.memory[CPU.PROGRAM_ROM_START] = 0x6B // Sets VB
-        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x42 // with 0x42
+    fun `should set and get delay timer`() {
+        val delayTimer = 0x42
+        cpu.registers[0xB] = delayTimer
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets delay timer to VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x15
 
         cpu.tick()
-        cpu.reset()
+        cpu.registers[0xB] = 0
 
-        // TODO: Modify the stack and other registers
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0xFB // Sets VB to delay timer
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x07
+        cpu.tick()
 
-        assertEquals(CPU(), cpu)
+        assertEquals(0x41, cpu.registers[0xB])
     }
 }

@@ -7,21 +7,17 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     var i: Register = I_REGISTER_START
         private set
     private var pc: Register = PROGRAM_ROM_START
-    private var sp: Pointer = STACK_POINTER_START
-
-    fun reset() {
-        memory.fill(0)
-        registers.fill(0)
-        stack.fill(0)
-        pc = PROGRAM_ROM_START
-        sp = STACK_POINTER_START
-        i = I_REGISTER_START
-    }
+    private var sp: Register = STACK_POINTER_START
+    private var delayTimer = 0
 
     fun tick() {
         val opCode = fetchOpcode()
         incPC()
         executeOpCode(opCode)
+
+        if (delayTimer > 0) {
+            delayTimer--
+        }
     }
 
     // One opcode have 2 bytes.
@@ -45,7 +41,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_VX_VY_OPERATION -> vxVyOperation(opcode)
             OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY -> skipNextIfVxNotEqualsVy(opcode)
             OPCODE_SET_I_TO_NNN -> setIToNnn(opcode)
+            OPCODE_JUMP_TO_ADDRESS_NNN_PLUS_V0 -> jumpToAddressNnnPlusV0(opcode)
             OPCODE_DRAW_N_AT_VX_VY -> drawNAtVxVy(opcode)
+            OPCODE_TIMER_KEY_MEM_OPERATION -> timerKeyMemOperation(opcode)
             else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
         }
     }
@@ -53,7 +51,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     private fun clearScreenOrReturn(opcode: Opcode) = when (opcode.value) {
         OPCODE_CLEAR_SCREEN -> clearScreen()
         OPCODE_RETURN_FROM_SUBROUTINE -> returnFromSubRoutine()
-        else -> TODO("Opcode ${opcode.value.toString(16)} not implemented.")
+        else -> opcodeNotImplementedError(opcode)
     }
 
     private fun clearScreen() {
@@ -67,6 +65,11 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // Jumps to address NNN.
     private fun jumpToAddressNnn(opcode: Opcode) {
         pc = opcode.nnnData
+    }
+
+    // Jumps to the address NNN plus V0.
+    private fun jumpToAddressNnnPlusV0(opcode: Opcode) {
+        pc = opcode.nnnData + registers[0x0]
     }
 
     // Calls subroutine at NNN.
@@ -123,7 +126,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         OPCODE_N_SHIFT_RIGHT_VX_FROM_VY -> shiftRightVx(opcode)
         OPCODE_N_SUBTRACT_VX_FROM_VY -> subtractVxFromVy(opcode)
         OPCODE_N_SHIFT_LEFT_VX_FROM_VY -> shiftLeftVx(opcode)
-        else -> TODO("Opcode ${opcode.value.toString(16)} not implemented.")
+        else -> opcodeNotImplementedError(opcode)
     }
 
     // Sets VX to the value of VY.
@@ -223,8 +226,50 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         }
     }
 
+    // FXNN Operations.
+    private fun timerKeyMemOperation(opcode: Opcode) = when (opcode.nnData) {
+        OPCODE_NN_SET_VX_TO_DELAY_TIMER -> setVxToDelayTimer(opcode)
+        OPCODE_NN_SET_DELAY_TIMER_TO_VX -> setDelayTimerToVx(opcode)
+        OPCODE_NN_SET_VX_TO_I_BCD -> setVxToIBcd(opcode)
+        OPCODE_NN_SET_I_TO_SPRITE_AT_VX -> setIToSpriteAtVx(opcode)
+        OPCODE_NN_SET_I_TO_V0_UNTIL_VX -> setIToV0UntilVx(opcode)
+        OPCODE_NN_SET_V0_UNTIL_VX_TO_I -> setV0UntilVxToI(opcode)
+        else -> opcodeNotImplementedError(opcode)
+    }
+
+    // Sets VX to the value of the delay timer.
+    private fun setVxToDelayTimer(opcode: Opcode) {
+        registers[opcode.vx] = delayTimer
+    }
+
+    // Sets the delay timer to VX.
+    private fun setDelayTimerToVx(opcode: Opcode) {
+        delayTimer = registers[opcode.vx]
+    }
+
+    private fun setIToSpriteAtVx(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
+        // i = memory[registers[opcode.vx]]
+    }
+
+    private fun setVxToIBcd(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
+    }
+
+    private fun setIToV0UntilVx(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
+    }
+
+    private fun setV0UntilVxToI(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
+    }
+
     private fun incPC() {
         pc += 2
+    }
+
+    private fun opcodeNotImplementedError(opcode: Opcode) {
+        TODO("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -289,6 +334,15 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_N_SHIFT_LEFT_VX_FROM_VY: Instruction = 0xE
         private const val OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY: Instruction = 0x9000
         private const val OPCODE_SET_I_TO_NNN: Instruction = 0xA000
+        private const val OPCODE_JUMP_TO_ADDRESS_NNN_PLUS_V0: Instruction = 0xB000
         private const val OPCODE_DRAW_N_AT_VX_VY: Instruction = 0xD000
+        private const val OPCODE_TIMER_KEY_MEM_OPERATION: Instruction = 0xF000
+        private const val OPCODE_NN_SET_VX_TO_DELAY_TIMER: Instruction = 0x07
+        private const val OPCODE_NN_SET_VX_TO_KEY_PRESSED: Instruction = 0x0A
+        private const val OPCODE_NN_SET_DELAY_TIMER_TO_VX: Instruction = 0x15
+        private const val OPCODE_NN_SET_I_TO_SPRITE_AT_VX: Instruction = 0x29
+        private const val OPCODE_NN_SET_VX_TO_I_BCD: Instruction = 0x33
+        private const val OPCODE_NN_SET_I_TO_V0_UNTIL_VX: Instruction = 0x55
+        private const val OPCODE_NN_SET_V0_UNTIL_VX_TO_I: Instruction = 0x65
     }
 }
