@@ -9,6 +9,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     var i: Register = I_REGISTER_START
         private set
     var clock = DEFAULT_CLOCK
+    val keyPad: KeyPad = KeyPad(KEY_COUNT)
     private var pc: Register = PROGRAM_ROM_START
     private var sp: Register = STACK_POINTER_START
     private var delayTimer = 0
@@ -353,6 +354,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         const val SCREEN_WIDTH = 64
         const val SCREEN_PIXELS = SCREEN_HEIGHT * SCREEN_WIDTH
         const val STACK_SIZE = 16
+        const val KEY_COUNT = 16
         const val REGISTER_COUNT = 16
         const val VF_INDEX = 0xF
         const val PROGRAM_ROM_START: Register = 0x200

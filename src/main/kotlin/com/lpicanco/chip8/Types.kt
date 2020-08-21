@@ -6,4 +6,4 @@ typealias Stack = IntArray
 typealias Register = Int
 typealias Registers = IntArray
 typealias Instruction = Int
-typealias Pointer = Int
+typealias KeyPad = BooleanArray
