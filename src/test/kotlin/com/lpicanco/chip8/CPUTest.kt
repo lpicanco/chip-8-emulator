@@ -468,4 +468,46 @@ internal class CPUTest {
 
         assertEquals(CPU.FONT_ROM_START + 0xE, cpu.i)
     }
+
+    @Test
+    fun `should fill V0 until VX with I`() {
+        val address = 0x600
+        cpu.memory[address] = 0x6
+        cpu.memory[address + 1] = 0x7
+        cpu.memory[address + 2] = 0x8
+        cpu.memory[address + 3] = 0x9
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xA6 // Sets I with 0x600
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x00
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0xF3 // Fill V0 until V3 with I
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x65
+        cpu.tick()
+        cpu.tick()
+
+        assertEquals(0x6, cpu.registers[0x0])
+        assertEquals(0x7, cpu.registers[0x1])
+        assertEquals(0x8, cpu.registers[0x2])
+        assertEquals(0x9, cpu.registers[0x3])
+    }
+
+    @Test
+    fun `should set I address to V0 until VX`() {
+        val address = 0x600
+        cpu.registers[0x0] = 0x6
+        cpu.registers[0x1] = 0x7
+        cpu.registers[0x2] = 0x8
+        cpu.registers[0x3] = 0x9
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xA6 // Sets I with 0x600
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x00
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0xF3 // Set with V0 until V3
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x55
+        cpu.tick()
+        cpu.tick()
+
+        assertEquals(0x6, cpu.memory[address])
+        assertEquals(0x7, cpu.memory[address + 0x1])
+        assertEquals(0x8, cpu.memory[address + 0x2])
+        assertEquals(0x9, cpu.memory[address + 0x3])
+    }
 }
