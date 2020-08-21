@@ -240,7 +240,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         }
     }
 
-    private fun keyOperation(opcode: Opcode) = when(opcode.nnData) {
+    private fun keyOperation(opcode: Opcode) = when (opcode.nnData) {
         OPCODE_NN_SKIP_NEXT_IF_KEY_AT_VX_IS_PRESSED -> skipNextIfKeyAtVxIsPressed(opcode)
         OPCODE_NN_SKIP_NEXT_IF_KEY_AT_VX_IS_NOT_PRESSED -> skipNextIfKeyAtVxIsNotPressed(opcode)
         else -> opcodeNotImplementedError(opcode)

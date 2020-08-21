@@ -1,7 +1,6 @@
 package com.lpicanco.chip8
 
 import org.junit.Test
-import kotlin.random.Random
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -469,6 +468,4 @@ internal class CPUTest {
 
         assertEquals(CPU.FONT_ROM_START + 0xE, cpu.i)
     }
-
-
 }
