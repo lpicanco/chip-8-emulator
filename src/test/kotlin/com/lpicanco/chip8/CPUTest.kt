@@ -1,8 +1,10 @@
 package com.lpicanco.chip8
 
 import org.junit.Test
+import kotlin.random.Random
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 internal class CPUTest {
     private lateinit var cpu: CPU
@@ -10,6 +12,7 @@ internal class CPUTest {
     @BeforeTest
     fun init() {
         cpu = CPU()
+        FONT.copyInto(cpu.memory, CPU.FONT_ROM_START)
     }
 
     @Test
@@ -47,6 +50,21 @@ internal class CPUTest {
         cpu.tick()
 
         assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should set VX to random AND NN`() {
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xCA // Set VA to random
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xFF // AND 0xFF
+
+        cpu.tick()
+
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0xCB // Set VB to random
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0xFF // AND 0xFF
+
+        cpu.tick()
+
+        assertNotEquals(cpu.registers[0xA], cpu.registers[0xB])
     }
 
     @Test
@@ -239,11 +257,28 @@ internal class CPUTest {
         cpu.registers[0xA] = 0xDD
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x7A // Adds to VA
-        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xFC // 0x42
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xFC // 0xFC
 
         cpu.tick()
 
         assertEquals(0xD9, cpu.registers[0xA])
+    }
+
+    @Test
+    fun `should add VX to I without carry flag`() {
+        cpu.registers[0xA] = 0xFDFF
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xFA // Adds VA to I
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x1E
+
+        cpu.tick()
+        assertEquals(0xFDFF, cpu.i)
+
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0xFA // Adds VA to I again
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x1E
+
+        cpu.tick()
+
+        assertEquals(0xFBFE, cpu.i)
     }
 
     @Test
@@ -408,6 +443,7 @@ internal class CPUTest {
     @Test
     fun `should set and get delay timer`() {
         val delayTimer = 0x42
+        cpu.clock = 59
         cpu.registers[0xB] = delayTimer
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets delay timer to VB
@@ -422,4 +458,17 @@ internal class CPUTest {
 
         assertEquals(0x41, cpu.registers[0xB])
     }
+
+    @Test
+    fun `should set I to the location of the sprite for the character in VX`() {
+        cpu.registers[0xB] = 0xE
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets I to sprite at VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x29
+
+        cpu.tick()
+
+        assertEquals(CPU.FONT_ROM_START + 0xE, cpu.i)
+    }
+
+
 }

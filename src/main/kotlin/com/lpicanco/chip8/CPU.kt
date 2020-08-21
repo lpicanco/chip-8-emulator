@@ -1,22 +1,29 @@
 package com.lpicanco.chip8
 
+import kotlin.random.Random
+
 class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     val screen: Screen = Screen(SCREEN_PIXELS)
     val registers: Registers = Registers(REGISTER_COUNT)
     val stack: Stack = Stack(STACK_SIZE)
     var i: Register = I_REGISTER_START
         private set
+    var clock = DEFAULT_CLOCK
     private var pc: Register = PROGRAM_ROM_START
     private var sp: Register = STACK_POINTER_START
     private var delayTimer = 0
+    private var tickCount = 0
 
     fun tick() {
         val opCode = fetchOpcode()
         incPC()
         executeOpCode(opCode)
 
-        if (delayTimer > 0) {
-            delayTimer--
+        if (tickCount++ > (clock / 60)) {
+            if (delayTimer > 0) {
+                delayTimer--
+            }
+            tickCount = 0
         }
     }
 
@@ -42,9 +49,11 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
             OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY -> skipNextIfVxNotEqualsVy(opcode)
             OPCODE_SET_I_TO_NNN -> setIToNnn(opcode)
             OPCODE_JUMP_TO_ADDRESS_NNN_PLUS_V0 -> jumpToAddressNnnPlusV0(opcode)
+            OPCODE_SET_VX_TO_RANDOM_AND_NN -> setVxToRandomAndNn(opcode)
             OPCODE_DRAW_N_AT_VX_VY -> drawNAtVxVy(opcode)
+            OPCODE_KEY_OPERATION -> keyOperation(opcode)
             OPCODE_TIMER_KEY_MEM_OPERATION -> timerKeyMemOperation(opcode)
-            else -> TODO("Instruction ${opcode.instruction.toString(16)} not implemented.")
+            else -> opcodeNotImplementedError(opcode)
         }
     }
 
@@ -70,6 +79,11 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // Jumps to the address NNN plus V0.
     private fun jumpToAddressNnnPlusV0(opcode: Opcode) {
         pc = opcode.nnnData + registers[0x0]
+    }
+
+    // Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
+    private fun setVxToRandomAndNn(opcode: Opcode) {
+        registers[opcode.vx] = Random.nextInt(0xFF) and opcode.nnData
     }
 
     // Calls subroutine at NNN.
@@ -226,10 +240,25 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         }
     }
 
+    private fun keyOperation(opcode: Opcode) = when(opcode.nnData) {
+        OPCODE_NN_SKIP_NEXT_IF_KEY_AT_VX_IS_PRESSED -> skipNextIfKeyAtVxIsPressed(opcode)
+        OPCODE_NN_SKIP_NEXT_IF_KEY_AT_VX_IS_NOT_PRESSED -> skipNextIfKeyAtVxIsNotPressed(opcode)
+        else -> opcodeNotImplementedError(opcode)
+    }
+
+    private fun skipNextIfKeyAtVxIsNotPressed(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
+    }
+
+    private fun skipNextIfKeyAtVxIsPressed(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
+    }
+
     // FXNN Operations.
     private fun timerKeyMemOperation(opcode: Opcode) = when (opcode.nnData) {
         OPCODE_NN_SET_VX_TO_DELAY_TIMER -> setVxToDelayTimer(opcode)
         OPCODE_NN_SET_DELAY_TIMER_TO_VX -> setDelayTimerToVx(opcode)
+        OPCODE_NN_ADD_VX_TO_I -> addVxToI(opcode)
         OPCODE_NN_SET_VX_TO_I_BCD -> setVxToIBcd(opcode)
         OPCODE_NN_SET_I_TO_SPRITE_AT_VX -> setIToSpriteAtVx(opcode)
         OPCODE_NN_SET_I_TO_V0_UNTIL_VX -> setIToV0UntilVx(opcode)
@@ -247,19 +276,30 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         delayTimer = registers[opcode.vx]
     }
 
-    private fun setIToSpriteAtVx(opcode: Opcode) {
-        opcodeNotImplementedError(opcode)
-        // i = memory[registers[opcode.vx]]
+    private fun addVxToI(opcode: Opcode) {
+        i = (i + registers[opcode.vx]).toUShort().toInt()
     }
 
+    // Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
+    private fun setIToSpriteAtVx(opcode: Opcode) {
+        val sprite = registers[opcode.vx]
+        i = FONT_ROM_START + sprite
+    }
+
+    // Stores the binary-coded decimal representation of VX, with the most significant of three digits at the
+    // address in I, the middle digit at I plus 1, and the least significant digit at I plus 2.
     private fun setVxToIBcd(opcode: Opcode) {
         opcodeNotImplementedError(opcode)
     }
 
+    // Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased
+    // by 1 for each value written, but I itself is left unmodified.
     private fun setIToV0UntilVx(opcode: Opcode) {
         opcodeNotImplementedError(opcode)
     }
 
+    // Fills V0 to VX (including VX) with values from memory starting at address I. The offset from I is
+    // increased by 1 for each value written, but I itself is left unmodified.[d
     private fun setV0UntilVxToI(opcode: Opcode) {
         opcodeNotImplementedError(opcode)
     }
@@ -269,7 +309,8 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     }
 
     private fun opcodeNotImplementedError(opcode: Opcode) {
-        TODO("Opcode ${opcode.value.toString(16)} not implemented.")
+        println("Opcode ${opcode.value.toString(16)} not implemented.")
+        // TODO("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -309,6 +350,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         const val REGISTER_COUNT = 16
         const val VF_INDEX = 0xF
         const val PROGRAM_ROM_START: Register = 0x200
+        const val FONT_ROM_START: Register = 0x000
+        const val DEFAULT_CLOCK = 500
+
         const val STACK_POINTER_START: Register = 0x0
         const val I_REGISTER_START: Register = 0x0
 
@@ -335,11 +379,16 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_SKIP_NEXT_IF_VX_NOT_EQUALS_VY: Instruction = 0x9000
         private const val OPCODE_SET_I_TO_NNN: Instruction = 0xA000
         private const val OPCODE_JUMP_TO_ADDRESS_NNN_PLUS_V0: Instruction = 0xB000
+        private const val OPCODE_SET_VX_TO_RANDOM_AND_NN: Instruction = 0xC000
         private const val OPCODE_DRAW_N_AT_VX_VY: Instruction = 0xD000
+        private const val OPCODE_KEY_OPERATION: Instruction = 0xE000
         private const val OPCODE_TIMER_KEY_MEM_OPERATION: Instruction = 0xF000
+        private const val OPCODE_NN_SKIP_NEXT_IF_KEY_AT_VX_IS_PRESSED: Instruction = 0x9E
+        private const val OPCODE_NN_SKIP_NEXT_IF_KEY_AT_VX_IS_NOT_PRESSED: Instruction = 0xA1
         private const val OPCODE_NN_SET_VX_TO_DELAY_TIMER: Instruction = 0x07
         private const val OPCODE_NN_SET_VX_TO_KEY_PRESSED: Instruction = 0x0A
         private const val OPCODE_NN_SET_DELAY_TIMER_TO_VX: Instruction = 0x15
+        private const val OPCODE_NN_ADD_VX_TO_I: Instruction = 0x1E
         private const val OPCODE_NN_SET_I_TO_SPRITE_AT_VX: Instruction = 0x29
         private const val OPCODE_NN_SET_VX_TO_I_BCD: Instruction = 0x33
         private const val OPCODE_NN_SET_I_TO_V0_UNTIL_VX: Instruction = 0x55
