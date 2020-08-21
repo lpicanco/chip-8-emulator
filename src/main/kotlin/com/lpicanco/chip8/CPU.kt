@@ -289,7 +289,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // Stores the binary-coded decimal representation of VX, with the most significant of three digits at the
     // address in I, the middle digit at I plus 1, and the least significant digit at I plus 2.
     private fun setVxToIBcd(opcode: Opcode) {
-        opcodeNotImplementedError(opcode)
+        memory[i] = registers[opcode.vx] / 100
+        memory[i + 1] = (registers[opcode.vx] % 100) / 10
+        memory[i + 2] = (registers[opcode.vx] % 100) % 10
     }
 
     // Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased

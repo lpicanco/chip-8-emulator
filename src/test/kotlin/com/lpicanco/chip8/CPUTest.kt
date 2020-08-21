@@ -510,4 +510,20 @@ internal class CPUTest {
         assertEquals(0x8, cpu.memory[address + 0x2])
         assertEquals(0x9, cpu.memory[address + 0x3])
     }
+
+    @Test
+    fun `should set I with BCD of VX`() {
+        val address = 0x600
+        cpu.registers[0xB] = 0x420
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xA6 // Sets I with 0x600
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x00
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0xFB // Sets I with BCD of VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x33
+        cpu.tick()
+        cpu.tick()
+
+        assertEquals(0xA, cpu.memory[address])
+        assertEquals(0x5, cpu.memory[address + 0x1])
+        assertEquals(0x6, cpu.memory[address + 0x2])
+    }
 }
