@@ -455,7 +455,7 @@ internal class CPUTest {
         cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x07
         cpu.tick()
 
-        assertEquals(0x41, cpu.registers[0xB])
+        assertEquals(0x42, cpu.registers[0xB])
     }
 
     @Test
