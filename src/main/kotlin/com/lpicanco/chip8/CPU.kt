@@ -295,9 +295,8 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased
     // by 1 for each value written, but I itself is left unmodified.
     private fun setIToV0UntilVx(opcode: Opcode) {
-        var pointer = i
-        for(n in 0..opcode.vx) {
-            memory[pointer++] = registers[n]
+        for (n in 0..opcode.vx) {
+            memory[i + n] = registers[n]
         }
     }
 
@@ -305,7 +304,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // increased by 1 for each value written, but I itself is left unmodified.[d
     private fun setV0UntilVxToI(opcode: Opcode) {
         var pointer = i
-        for(n in 0..opcode.vx) {
+        for (n in 0..opcode.vx) {
             registers[n] = memory[pointer++]
         }
     }
@@ -315,7 +314,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     }
 
     private fun opcodeNotImplementedError(opcode: Opcode) {
-         TODO("Opcode ${opcode.value.toString(16)} not implemented.")
+        TODO("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
     override fun equals(other: Any?): Boolean {
