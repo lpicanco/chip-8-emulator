@@ -1,7 +1,7 @@
 package com.lpicanco.chip8
 
-import org.junit.Test
 import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
