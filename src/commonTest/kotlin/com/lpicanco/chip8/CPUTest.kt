@@ -459,6 +459,20 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should block until key pressed and store the key at VX`() {
+        val key = 0xA
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets key pressed to VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x0A
+
+        cpu.tick()
+        assertEquals(0x0, cpu.registers[0xB])
+
+        cpu.keyPad[key] = true
+        cpu.tick()
+        assertEquals(key, cpu.registers[0xB])
+    }
+
+    @Test
     fun `should set I to the location of the sprite for the character in VX`() {
         cpu.registers[0xB] = 0xE
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets I to sprite at VB

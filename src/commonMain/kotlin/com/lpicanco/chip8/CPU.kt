@@ -258,7 +258,9 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     // FXNN Operations.
     private fun timerKeyMemOperation(opcode: Opcode) = when (opcode.nnData) {
         OPCODE_NN_SET_VX_TO_DELAY_TIMER -> setVxToDelayTimer(opcode)
+        OPCODE_NN_SET_VX_TO_KEY_PRESSED -> setVxToKeyPressed(opcode)
         OPCODE_NN_SET_DELAY_TIMER_TO_VX -> setDelayTimerToVx(opcode)
+        OPCODE_NN_SET_SOUND_TIMER_TO_VX -> setSoundTimerToVx(opcode)
         OPCODE_NN_ADD_VX_TO_I -> addVxToI(opcode)
         OPCODE_NN_SET_VX_TO_I_BCD -> setVxToIBcd(opcode)
         OPCODE_NN_SET_I_TO_SPRITE_AT_VX -> setIToSpriteAtVx(opcode)
@@ -272,9 +274,25 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         registers[opcode.vx] = delayTimer
     }
 
+    // A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
+    private fun setVxToKeyPressed(opcode: Opcode) {
+        val keyPressed = keyPad.indexOfFirst { it }
+
+        if (keyPressed >= 0) {
+            registers[opcode.vx] = keyPressed
+        } else {
+            decPC()
+        }
+    }
+
     // Sets the delay timer to VX.
     private fun setDelayTimerToVx(opcode: Opcode) {
         delayTimer = registers[opcode.vx]
+    }
+
+    // Sets the sound timer to VX.
+    private fun setSoundTimerToVx(opcode: Opcode) {
+        opcodeNotImplementedError(opcode)
     }
 
     private fun addVxToI(opcode: Opcode) {
@@ -314,6 +332,10 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
 
     private fun incPC() {
         pc += 2
+    }
+
+    private fun decPC() {
+        pc -= 2
     }
 
     private fun opcodeNotImplementedError(opcode: Opcode) {
@@ -394,6 +416,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
         private const val OPCODE_NN_SET_VX_TO_DELAY_TIMER: Instruction = 0x07
         private const val OPCODE_NN_SET_VX_TO_KEY_PRESSED: Instruction = 0x0A
         private const val OPCODE_NN_SET_DELAY_TIMER_TO_VX: Instruction = 0x15
+        private const val OPCODE_NN_SET_SOUND_TIMER_TO_VX: Instruction = 0x18
         private const val OPCODE_NN_ADD_VX_TO_I: Instruction = 0x1E
         private const val OPCODE_NN_SET_I_TO_SPRITE_AT_VX: Instruction = 0x29
         private const val OPCODE_NN_SET_VX_TO_I_BCD: Instruction = 0x33
