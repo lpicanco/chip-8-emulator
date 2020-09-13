@@ -8,7 +8,6 @@ A CHIP-8 Emulator in Kotlin
 ## Implemented Opcodes
 | Instruction | Description |Implemented|
 |:-----------:|:-----------:|:---------:|
-|   `0NNN`    | Execute machine language subroutine at address `NNN` | :heavy_check_mark: |
 |   `00E0`    | Clears the screen | :heavy_check_mark: |
 |   `00EE`    | Returns from a subroutine | :heavy_check_mark: |
 |   `1NNN`    | Jumps to address `NNN` | :heavy_check_mark: |
