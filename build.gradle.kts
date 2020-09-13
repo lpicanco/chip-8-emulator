@@ -12,6 +12,7 @@ apply(plugin = "jacoco")
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 kotlin {
@@ -26,12 +27,18 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
-
         withJava()
+    }
+    js {
+        browser()
     }
 
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -45,6 +52,19 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
+
+        val jsMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-js"))
+                implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.7.2")
+            }
+        }
+
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
+        }
     }
 }
 
@@ -56,6 +76,10 @@ tasks.withType<JacocoReport> {
         xml.isEnabled = true
         xml.destination = File("$buildDir/reports/jacoco/test/jacocoTestReport.xml")
     }
+}
+
+tasks.register("jvmBuild") {
+    dependsOn("jvmTest", "ktlintCheck", "jvmJar")
 }
 
 sonarqube {

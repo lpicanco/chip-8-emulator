@@ -24,8 +24,8 @@ jobs:
       uses: actions/setup-java@v1.4.1
       with:
         java-version: 1.8
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Build JVM with Gradle
+      run: ./gradlew jvmBuild
   
   sonarcloud:
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Jacoco Test Report
-      run: ./gradlew test jacocoTestReport
+      run: ./gradlew jvmTest jacocoTestReport
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@v1.3
     env:

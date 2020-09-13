@@ -16,7 +16,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should jump to address NNN`() {
+    fun shouldJumpToAddressNNN() {
         val jumpAddress = 0xF15
         cpu.memory[jumpAddress] = 0x6B // Sets VB
         cpu.memory[jumpAddress + 1] = 0x42 // with 0x42
@@ -34,7 +34,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should jump to address NNN+V0`() {
+    fun shouldJumpToAddressNNNPlusV0() {
         val jumpAddress = 0xF15
         cpu.registers[0x0] = 2
         cpu.memory[jumpAddress] = 0x6B // Sets VB
@@ -53,7 +53,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set VX to random AND NN`() {
+    fun shouldSetVXToRandomANDNN() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xCA // Set VA to random
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xFF // AND 0xFF
 
@@ -68,7 +68,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should call subroutine at address NNN`() {
+    fun shouldCallSubroutineAtAddressNNN() {
         val subRoutineAddress = 0xF15
         cpu.memory[subRoutineAddress] = 0x6B // Sets VB
         cpu.memory[subRoutineAddress + 1] = 0x42 // with 0x42
@@ -86,7 +86,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should skip next instruction if VX equals NN`() {
+    fun shouldSkipNextInstructionIfVXEqualsNN() {
         cpu.registers[0xA] = 0x55
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x3A // Skip if VA
@@ -101,7 +101,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should not skip next instruction if VX not equals NN`() {
+    fun shouldNotSkipNextInstructionIfVXNotEqualsNN() {
         cpu.registers[0xA] = 0x99
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x3A // Skip if VA
@@ -115,7 +115,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should skip next instruction if VX not equals NN`() {
+    fun shouldSkipNextInstructionIfVXNotEqualsNN() {
         cpu.registers[0xA] = 0x99
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x4A // Skip if VA
@@ -130,7 +130,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should not skip next instruction if VX equals NN`() {
+    fun shouldNotSkipNextInstructionIfVXEqualsNN() {
         cpu.registers[0xA] = 0x56
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x4A // Skip if VA
@@ -144,7 +144,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should skip next instruction if VX equals VY`() {
+    fun shouldSkipNextInstructionIfVXEqualsVY() {
         cpu.registers[0xA] = 0x55
         cpu.registers[0xB] = 0x55
 
@@ -160,7 +160,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should not skip next instruction if VX not equals VY`() {
+    fun shouldNotSkipNextInstructionIfVXNotEqualsVY() {
         cpu.registers[0xA] = 0x55
         cpu.registers[0xB] = 0x66
 
@@ -175,7 +175,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should skip next instruction if VX not equals VY`() {
+    fun shouldSkipNextInstructionIfVXNotEqualsVY() {
         cpu.registers[0xA] = 0x55
         cpu.registers[0xB] = 0x66
 
@@ -191,7 +191,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should not skip next instruction if VX equals VY`() {
+    fun shouldNotSkipNextInstructionIfVXEqualsVY() {
         cpu.registers[0xA] = 0x55
         cpu.registers[0xB] = 0x55
 
@@ -206,7 +206,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should return from a subroutine`() {
+    fun shouldReturnFromSubroutine() {
         val subRoutineAddress = 0xF15
         // Return from the subroutine.
         cpu.memory[subRoutineAddress] = 0x00 // Return from subroutine
@@ -231,7 +231,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set VX to NN`() {
+    fun shouldSetVXToNN() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x6B // Sets VB
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x42 // with 0x42
 
@@ -241,7 +241,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should add NN to VX`() {
+    fun shouldAddNNToVX() {
         cpu.registers[0xA] = 0x1A
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x7A // Adds to VA
@@ -253,7 +253,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should add NN to VX without carry flag`() {
+    fun shouldAddNNToVXWithoutCarryFlag() {
         cpu.registers[0xA] = 0xDD
 
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x7A // Adds to VA
@@ -265,7 +265,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should add VX to I without carry flag`() {
+    fun shouldAddVXToIWithoutCarryFlag() {
         cpu.registers[0xA] = 0xFDFF
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xFA // Adds VA to I
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x1E
@@ -282,7 +282,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set VX to VY`() {
+    fun shouldSetVXToVY() {
         cpu.registers[0xC] = 0x42
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC0 // with VC
@@ -293,7 +293,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set VX to VX OR VY`() {
+    fun shouldSetVXToVXORVY() {
         cpu.registers[0xB] = 0b01000010
         cpu.registers[0xC] = 0b10011000
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB with VB
@@ -305,7 +305,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set VX to VX AND VY`() {
+    fun shouldSetVXToVXANDVY() {
         cpu.registers[0xB] = 0b01010010
         cpu.registers[0xC] = 0b10011010
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB with VB
@@ -317,7 +317,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set VX to VX XOR VY`() {
+    fun shouldSetVXToVXXORVY() {
         cpu.registers[0xB] = 0b01010010
         cpu.registers[0xC] = 0b10011010
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Sets VB with VB
@@ -329,7 +329,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should add VY to VX`() {
+    fun shouldAddVYToVX() {
         cpu.registers[0xB] = 0xA3
         cpu.registers[0xC] = 0x3D
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Adds VC to VB
@@ -342,7 +342,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should add VY to VX and update VF with carry bit`() {
+    fun shouldAddVYToVXAndUpdateVFWithCarryFlag() {
         cpu.registers[0xB] = 0xA3
         cpu.registers[0xC] = 0xFD
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // Adds VC to VB
@@ -355,7 +355,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should subtract VY from VX and update VF with carry bit`() {
+    fun shouldSubtractVYFromVXAndUpdateVFWithCarryFlag() {
         cpu.registers[0xB] = 0xF3
         cpu.registers[0xC] = 0xAD
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB - VC
@@ -368,7 +368,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should subtract VY from VX`() {
+    fun shouldSubtractVYFromVX() {
         cpu.registers[0xB] = 0xAD
         cpu.registers[0xC] = 0xF3
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB - VC
@@ -381,7 +381,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should shift right VX`() {
+    fun shouldShiftRightVX() {
         cpu.registers[0xB] = 0x77
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB >> 1
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xC6
@@ -393,7 +393,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should shift left VX`() {
+    fun shouldShiftLeftVX() {
         cpu.registers[0xB] = 0xFF
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VB << 1
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xCE
@@ -405,7 +405,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should subtract VX from VY and update VF with carry bit`() {
+    fun shouldSubtractVXFromVYAndUpdateVFWithCarryFlag() {
         cpu.registers[0xB] = 0xAD
         cpu.registers[0xC] = 0xF3
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VC - VB
@@ -418,7 +418,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should subtract VX from VY`() {
+    fun shouldSubtractVXFromVY() {
         cpu.registers[0xB] = 0xF3
         cpu.registers[0xC] = 0xAD
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x8B // VB = VC - VB
@@ -431,7 +431,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set I to NNN`() {
+    fun shouldSetIToNNN() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xA7 // Sets I
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x65 // with 0x765
 
@@ -441,7 +441,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set and get delay timer`() {
+    fun shouldSetAndGetDelayTimer() {
         val delayTimer = 0x42
         cpu.clock = 59
         cpu.registers[0xB] = delayTimer
@@ -460,7 +460,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set the sound timer to VX`() {
+    fun shouldSetTheSoundTimerToVX() {
         val soundTimer = 0x42
         cpu.registers[0xB] = soundTimer
 
@@ -473,7 +473,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should block until key pressed and store the key at VX`() {
+    fun shouldBlockUntilKeyPressedAndStoreTheKeyToVX() {
         val key = 0xA
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets key pressed to VB
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x0A
@@ -488,7 +488,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should skip next instruction if key stored at VX is pressed`() {
+    fun shouldSkipNextInstructionIfKeyStoredAtVXIsPressed() {
         val key = 0x9
         cpu.registers[0xA] = key
 
@@ -505,7 +505,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should not skip next instruction if key stored at VX is not pressed`() {
+    fun shouldNotSkipNextInstructionIfKeyStoredAtVXIsNotPressed() {
         val key = 0x9
         cpu.registers[0xA] = key
 
@@ -520,7 +520,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should skip next instruction if key stored at VX is not pressed`() {
+    fun shouldSkipNextInstructionIfKeyStoredAtVXIsNotPressed() {
         val key = 0x9
         cpu.registers[0xA] = key
 
@@ -535,7 +535,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should not skip next instruction if key stored at VX is pressed`() {
+    fun shouldNotSkipNextInstructionIfKeyStoredAtVXIsPressed() {
         val key = 0x9
         cpu.registers[0xA] = key
 
@@ -552,7 +552,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set I to the location of the sprite for the character in VX`() {
+    fun shouldSetIToTheLocationOfTheSpriteForTheCharacterInVX() {
         cpu.registers[0xB] = 0xE
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets I to sprite at VB
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x29
@@ -563,7 +563,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should fill V0 until VX with I`() {
+    fun shouldFillV0UntilVXWithI() {
         val address = 0x600
         cpu.memory[address] = 0x6
         cpu.memory[address + 1] = 0x7
@@ -584,7 +584,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set I address to V0 until VX`() {
+    fun shouldSetIAddressToV0UntilVX() {
         val address = 0x600
         cpu.registers[0x0] = 0x6
         cpu.registers[0x1] = 0x7
@@ -605,7 +605,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should set I with BCD of VX`() {
+    fun shouldSetIWithBCDOfVX() {
         val address = 0x600
         cpu.registers[0xB] = 0x420
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xA6 // Sets I with 0x600
@@ -621,7 +621,7 @@ internal class CPUTest {
     }
 
     @Test
-    fun `should throw a error if the opcode is invalid`() {
+    fun shouldThrowExceptionIfTheOpcodeIsInvalid() {
         cpu.memory[CPU.PROGRAM_ROM_START] = 0x0
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x0
 

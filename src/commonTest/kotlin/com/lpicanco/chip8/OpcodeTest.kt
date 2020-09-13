@@ -6,37 +6,37 @@ import kotlin.test.assertEquals
 internal class OpcodeTest {
 
     @Test
-    fun `should return the opcode instruction`() {
+    fun shouldReturnTheOpcodeInstruction() {
         val opcode = Opcode(0x6A42)
         assertEquals(0x6000, opcode.instruction)
     }
 
     @Test
-    fun `should return the opcode vx`() {
+    fun shouldReturnTheOpcodeVx() {
         val opcode = Opcode(0x6A42)
         assertEquals(0xA, opcode.vx)
     }
 
     @Test
-    fun `should return the opcode vy`() {
+    fun shouldReturnTheOpcodeVy() {
         val opcode = Opcode(0x6A42)
         assertEquals(0x4, opcode.vy)
     }
 
     @Test
-    fun `should return the opcode nData`() {
+    fun shouldReturnTheOpcodeNData() {
         val opcode = Opcode(0x6A42)
         assertEquals(0x2, opcode.nData)
     }
 
     @Test
-    fun `should return the opcode nnData`() {
+    fun shouldReturnTheOpcodeNnData() {
         val opcode = Opcode(0x6A42)
         assertEquals(0x42, opcode.nnData)
     }
 
     @Test
-    fun `should return the opcode nnnData`() {
+    fun shouldReturnTheOpcodeNnnData() {
         val opcode = Opcode(0x1A42)
         assertEquals(0xA42, opcode.nnnData)
     }
