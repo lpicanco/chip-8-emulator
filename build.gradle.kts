@@ -30,7 +30,11 @@ kotlin {
         withJava()
     }
     js {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
     }
 
     sourceSets {
@@ -80,6 +84,10 @@ tasks.withType<JacocoReport> {
 
 tasks.register("jvmBuild") {
     dependsOn("jvmTest", "ktlintCheck", "jvmJar")
+}
+
+tasks.register("jsBuild") {
+    dependsOn("jsTest", "ktlintCheck", "jsJar")
 }
 
 sonarqube {
