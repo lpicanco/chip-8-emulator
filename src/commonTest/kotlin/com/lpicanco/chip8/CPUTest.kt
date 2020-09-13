@@ -465,11 +465,76 @@ internal class CPUTest {
         cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x0A
 
         cpu.tick()
+        cpu.tick()
         assertEquals(0x0, cpu.registers[0xB])
 
         cpu.keyPad[key] = true
         cpu.tick()
         assertEquals(key, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should skip next instruction if key stored at VX is pressed`() {
+        val key = 0x9
+        cpu.registers[0xA] = key
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xEA // Skip if key at VA is pressed
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x9E
+        cpu.memory[CPU.PROGRAM_ROM_START + 4] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 5] = 0x42 // with 0x42
+
+        cpu.keyPad[key] = true
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should not skip next instruction if key stored at VX is not pressed`() {
+        val key = 0x9
+        cpu.registers[0xA] = key
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xEA // Skip if key at VA is pressed
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x9E
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should skip next instruction if key stored at VX is not pressed`() {
+        val key = 0x9
+        cpu.registers[0xA] = key
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xEA // Skip if key at VA is not pressed
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xA1
+        cpu.memory[CPU.PROGRAM_ROM_START + 4] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 5] = 0x42 // with 0x42
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
+    }
+
+    @Test
+    fun `should not skip next instruction if key stored at VX is pressed`() {
+        val key = 0x9
+        cpu.registers[0xA] = key
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xEA // Skip if key at VA is not pressed
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0xA1
+        cpu.memory[CPU.PROGRAM_ROM_START + 2] = 0x6B // Sets VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 3] = 0x42 // with 0x42
+
+        cpu.keyPad[key] = true
+
+        cpu.tick()
+        cpu.tick()
+        assertEquals(0x42, cpu.registers[0xB])
     }
 
     @Test

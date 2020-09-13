@@ -31,8 +31,8 @@ A CHIP-8 Emulator in Kotlin
 |   `BNNN`    | Jumps to the address `NNN` plus `V0` | :heavy_check_mark: |
 |   `CXNN`    | Sets `VX` to the result of a bitwise and operation on a random number (Typically: 0 to 255) and `NN` | :heavy_check_mark: |
 |   `DXYN`    | Draws a sprite at coordinate (VX, `VY`) that has a width of 8 pixels and a height of `N`+1 pixels. Each row of 8 pixels is read as bit-coded starting from memory location `I`; `I` value doesn’t change after the execution of this instruction. As described above, `VF` is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn't happen | :heavy_check_mark: |
-|   `EX9E`    | Skips the next instruction if the key stored in `VX` is pressed |
-|   `EXA1`    | Skips the next instruction if the key stored in `VX` isn't pressed |
+|   `EX9E`    | Skips the next instruction if the key stored in `VX` is pressed | :heavy_check_mark: |
+|   `EXA1`    | Skips the next instruction if the key stored in `VX` isn't pressed | :heavy_check_mark: |
 |   `FX07`    | Sets `VX` to the value of the delay timer | :heavy_check_mark: |
 |   `FX0A`    | A key press is awaited, and then stored in `VX`. (Blocking Operation. All instruction halted until next key event) | :heavy_check_mark: |
 |   `FX15`    | Sets the delay timer to `VX` | :heavy_check_mark: |

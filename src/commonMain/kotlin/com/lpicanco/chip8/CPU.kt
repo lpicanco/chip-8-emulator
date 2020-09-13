@@ -248,11 +248,17 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     }
 
     private fun skipNextIfKeyAtVxIsNotPressed(opcode: Opcode) {
-        opcodeNotImplementedError(opcode)
+        val key = registers[opcode.vx]
+        if (!keyPad[key]) {
+            incPC()
+        }
     }
 
     private fun skipNextIfKeyAtVxIsPressed(opcode: Opcode) {
-        opcodeNotImplementedError(opcode)
+        val key = registers[opcode.vx]
+        if (keyPad[key]) {
+            incPC()
+        }
     }
 
     // FXNN Operations.
