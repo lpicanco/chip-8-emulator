@@ -459,6 +459,19 @@ internal class CPUTest {
     }
 
     @Test
+    fun `should set the sound timer to VX`() {
+        val soundTimer = 0x42
+        cpu.registers[0xB] = soundTimer
+
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets sound timer to VB
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x18
+
+        cpu.tick()
+
+        assertEquals(0x42, cpu.soundTimer)
+    }
+
+    @Test
     fun `should block until key pressed and store the key at VX`() {
         val key = 0xA
         cpu.memory[CPU.PROGRAM_ROM_START] = 0xFB // Sets key pressed to VB

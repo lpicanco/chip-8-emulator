@@ -13,6 +13,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     private var pc: Register = PROGRAM_ROM_START
     private var sp: Register = STACK_POINTER_START
     private var delayTimer = 0
+    var soundTimer = 0
     private var tickCount = 0
 
     fun tick() {
@@ -298,7 +299,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
 
     // Sets the sound timer to VX.
     private fun setSoundTimerToVx(opcode: Opcode) {
-        opcodeNotImplementedError(opcode)
+        soundTimer = registers[opcode.vx]
     }
 
     private fun addVxToI(opcode: Opcode) {
@@ -345,7 +346,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     }
 
     private fun opcodeNotImplementedError(opcode: Opcode) {
-        TODO("Opcode ${opcode.value.toString(16)} not implemented.")
+        throw Exception("Opcode ${opcode.value.toString(16)} not implemented.")
     }
 
     override fun equals(other: Any?): Boolean {
