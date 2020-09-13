@@ -3,6 +3,7 @@ package com.lpicanco.chip8
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertNotEquals
 
 internal class CPUTest {
@@ -617,5 +618,13 @@ internal class CPUTest {
         assertEquals(0xA, cpu.memory[address])
         assertEquals(0x5, cpu.memory[address + 0x1])
         assertEquals(0x6, cpu.memory[address + 0x2])
+    }
+
+    @Test
+    fun `should throw a error if the opcode is invalid`() {
+        cpu.memory[CPU.PROGRAM_ROM_START] = 0x0
+        cpu.memory[CPU.PROGRAM_ROM_START + 1] = 0x0
+
+        assertFails { cpu.tick() }
     }
 }
