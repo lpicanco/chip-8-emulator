@@ -30,6 +30,12 @@ kotlin {
         withJava()
     }
     js {
+        compilations.all {
+            kotlinOptions {
+                sourceMap = true
+                metaInfo = true
+            }
+        }
         browser {
             testTask {
                 enabled = false
@@ -62,6 +68,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
                 implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.7.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.9")
             }
         }
 

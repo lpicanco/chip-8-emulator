@@ -346,7 +346,7 @@ class CPU(val memory: Memory = Memory(MEMORY_SIZE)) {
     }
 
     private fun opcodeNotImplementedError(opcode: Opcode) {
-        throw Exception("Opcode ${opcode.value.toString(16)} not implemented.")
+        throw Exception("Opcode ${opcode.value.toString(16)} not implemented. PC: ${pc.toString(16)}")
     }
 
     override fun equals(other: Any?): Boolean {

@@ -10,6 +10,9 @@ class Emulator(romData: IntArray) {
         get() = cpu.registers
     val screen: Screen
         get() = cpu.screen
+    val keyPad: KeyPad
+        get() = cpu.keyPad
+    private var running = false
 
     init {
         val memory = Memory(CPU.MEMORY_SIZE)
@@ -19,9 +22,14 @@ class Emulator(romData: IntArray) {
     }
 
     suspend fun run() {
-        while (true) {
+        running = true
+        while (running) {
             cpu.tick()
             delay(1000L / cpu.clock)
         }
+    }
+
+    fun stop() {
+        running = false
     }
 }
