@@ -26,6 +26,12 @@ internal class EmulatorTest {
     }
 
     @Test
+    fun shouldReturnTheKeyPad() {
+        val emulator = Emulator(intArrayOf())
+        assertTrue(emulator.keyPad.all { !it })
+    }
+
+    @Test
     fun shouldRunTheCPU() {
         val romData = intArrayOf(
             0x6B, // Sets VB
@@ -42,6 +48,27 @@ internal class EmulatorTest {
             delay(100L)
             assertEquals(0x42, emulator.registers[0xB])
             assertEquals(0x43, emulator.registers[0xC])
+        }
+    }
+
+    @Test
+    fun shouldStopTheCPU() {
+        val romData = intArrayOf(
+            0x6B, // Sets VB
+            0x42, // with 0x42
+            0x6C, // Sets VC
+            0x43, // with 0x43
+            0x12, // Jumps to 0x200
+            0x00
+        )
+
+        val emulator = Emulator(romData)
+        runBlocking {
+            GlobalScope.launch { emulator.run() }
+            GlobalScope.launch { emulator.stop() }
+            delay(100L)
+            assertEquals(0x42, emulator.registers[0xB])
+            assertEquals(0x0, emulator.registers[0xC])
         }
     }
 }
