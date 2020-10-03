@@ -73,7 +73,6 @@ internal class EmulatorTest {
             GlobalScope.launch { emulator.run() }
             GlobalScope.launch { emulator.stop() }
             delay(100L)
-            assertEquals(0x42, emulator.registers[0xB])
             assertEquals(0x0, emulator.registers[0xC])
         }
     }
