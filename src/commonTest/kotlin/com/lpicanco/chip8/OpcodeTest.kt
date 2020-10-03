@@ -40,4 +40,10 @@ internal class OpcodeTest {
         val opcode = Opcode(0x1A42)
         assertEquals(0xA42, opcode.nnnData)
     }
+
+    @Test
+    fun shouldConvertToString() {
+        val opcode = Opcode(0x1A42)
+        assertEquals("1a42", opcode.toString())
+    }
 }
