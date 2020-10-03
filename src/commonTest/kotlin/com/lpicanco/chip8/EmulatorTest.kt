@@ -32,6 +32,12 @@ internal class EmulatorTest {
     }
 
     @Test
+    fun shouldReturnTheScreen() {
+        val emulator = Emulator(intArrayOf())
+        assertTrue(emulator.screen.all { !it })
+    }
+
+    @Test
     fun shouldRunTheCPU() {
         val romData = intArrayOf(
             0x6B, // Sets VB
