@@ -8,6 +8,9 @@ A CHIP-8 Emulator in Kotlin Multiplatform targeting the JVM and JS
 
 [https://lpicanco.github.io/chip-8-emulator/](https://lpicanco.github.io/chip-8-emulator/)
 
+![Demo](https://github.com/lpicanco/chip-8-emulator/raw/master/img/blinky_animated.gif)
+
+
 ## Implemented Opcodes
 | Instruction | Description |
 |:-----------:|:-----------:|
